@@ -45,7 +45,7 @@ echo "Uploading the config file to the file share"
 az storage file upload -s $STORAGE_SHARE_NAME \
   --source config.yaml \
   --account-key $STORAGE_ACCOUNT_KEY \
-  --account-name $STORAGE_ACCOUNT_NAME 
+  --account-name $STORAGE_ACCOUNT_NAME > /dev/null
 
 # Create Container App Environment
 echo "Creating a container App environment called $ENVIRONMENT_NAME"
@@ -110,15 +110,19 @@ az containerapp update \
 export CONTAINER_APP_INGRESS=$(yq '.properties.configuration.ingress.fqdn' app.yaml)
 
 export OTEL_EXPORTER_OTLP_ENDPOINT=https://$CONTAINER_APP_INGRESS/v1/traces
+echo ""
 echo "======"
 echo "Collector is at $CONTAINER_APP_INGRESS"
 echo "Traces url is https://$CONTAINER_APP_INGRESS/v1/traces"
 echo "Otel-cli has been setup, to test copy this:"
+echo ""
+echo "export OTEL_EXPORTER_OTLP_ENDPOINT=https://$CONTAINER_APP_INGRESS/v1/traces"
 echo "otel-cli span --service \"CLI\" \ "
 echo "   --name \"OpenTelemetry Collector In Azure Container Apps\" \ "
 echo "   --start \$(date +%s.%N) \ "
 echo "   --end \$(date +%s.%N) \ "
 echo "   --verbose"
+echo ""
 echo "HAPPY TRACING!!!!"
 
 rm app.yaml
