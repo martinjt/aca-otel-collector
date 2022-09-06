@@ -5,6 +5,24 @@ receivers:
 
 processors:
   batch:
+  attributes/collector_info:
+    actions:
+      - key: collector.hostname
+        value: $HOSTNAME
+        action: insert
+      - key: azure.container_app.revision
+        value: $CONTAINER_APP_REVISION
+        action: insert
+      - key: azure.container_app.name
+        value: $CONTAINER_APP_REVISION
+        action: insert
+  filter/healthcheck:
+    spans:
+      exclude:
+        match_type: strict
+        attributes:
+          - Key: http.target
+            Value: /health
 
 exporters:
   otlp:
@@ -21,7 +39,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
+      processors: [batch,attributes/collector_info,filter/healthcheck]
       exporters: [otlp]
     metrics:
       receivers: [otlp]
